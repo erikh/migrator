@@ -1,0 +1,72 @@
+package main
+
+import (
+	"fmt"
+	"os"
+	"path"
+
+	"github.com/jackc/pgx"
+	"github.com/pkg/errors"
+	"github.com/urfave/cli"
+)
+
+const appVersion = "0.1.0"
+
+func main() {
+	app := cli.NewApp()
+	app.Usage = "Migrate SQL databases with ordered execution"
+	app.UsageText = path.Base(os.Args[0]) + " [options] [dir]"
+	app.Version = appVersion
+
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:  "username, u",
+			Usage: "Sets the username for the connection",
+		},
+		cli.StringFlag{
+			Name:  "password, p",
+			Usage: "Sets the password for the connection",
+		},
+		cli.StringFlag{
+			Name:  "database, d",
+			Usage: "Set the database for the migration (default: name of dir provided)",
+		},
+		cli.StringFlag{
+			Name:  "host, t",
+			Usage: "Set the host to connect to (can be a unix socket)",
+			Value: "localhost",
+		},
+		cli.IntFlag{
+			Name:  "port, o",
+			Usage: "Set the port to connect to",
+		},
+	}
+
+	app.Action = migrate
+
+	if err := app.Run(os.Args); err != nil {
+		fmt.Fprintln(os.Stderr, "error running "+os.Args[0]+": "+err.Error())
+		os.Exit(1)
+	}
+}
+
+func migrate(ctx *cli.Context) error {
+	args := ctx.Args()
+	if len(args) != 1 {
+		cli.ShowAppHelp(ctx)
+		return errors.New("please provide a migration directory")
+	}
+
+	conn, err := pgx.Connect(pgx.ConnConfig{
+		Host:     ctx.String("host"),
+		Port:     uint16(ctx.Int("port")),
+		Database: ctx.String("database"),
+		User:     ctx.String("username"),
+		Password: ctx.String("password"),
+	})
+	if err != nil {
+		return errors.Wrap(err, "migrator")
+	}
+
+	return doMigrate(conn, args[0])
+}
