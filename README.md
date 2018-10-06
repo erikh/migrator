@@ -26,6 +26,11 @@ dir/
   2.sql
 ```
 
+The `.sql` files contain arbitrary SQL, but is intended to result in a DDL
+transaction where tables are modified, indexes etc. You can use as advanced SQL
+as you like and as many statements. Nothing is done with set results, so make
+sure they apply to where you want them to!
+
 When finished migrating this directory, your id would be `2`. This will carry
 over to the next run to avoid applying those migrations.
 
