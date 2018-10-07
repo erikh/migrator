@@ -20,7 +20,7 @@ var (
 	cyan  = color.New(color.FgHiCyan)
 )
 
-func doMigrate(conn *pgx.Conn, dir string) (retErr error) {
+func doMigrate(conn *pgx.Conn, dir string, quiet bool) (retErr error) {
 	defer func() {
 		if retErr != nil {
 			retErr = errors.Wrap(retErr, "migrator: during migration")
@@ -42,7 +42,7 @@ func doMigrate(conn *pgx.Conn, dir string) (retErr error) {
 	}
 
 	for i := min; i <= max; i++ {
-		if err := apply(conn, dir, i); err != nil {
+		if err := apply(conn, dir, i, quiet); err != nil {
 			return err
 		}
 	}
@@ -106,7 +106,7 @@ func getNewestAvailable(dir string) (int, error) {
 	return maxID, nil
 }
 
-func apply(conn *pgx.Conn, dir string, i int) error {
+func apply(conn *pgx.Conn, dir string, i int, quiet bool) error {
 	tx, err := conn.Begin()
 	if err != nil {
 		return err
@@ -119,22 +119,24 @@ func apply(conn *pgx.Conn, dir string, i int) error {
 		return err
 	}
 
-	w, _, err := terminal.GetSize(0)
-	if err == nil {
-		num := fmt.Sprintf("%d.sql", i)
-		white.Println(strings.Repeat("-", w))
-		cyan.Print(strings.Repeat(" ", w/2-len(num)/2))
-		cyan.Print(num)
-		cyan.Println(strings.Repeat(" ", w/2-len(num)/2))
-		white.Println(strings.Repeat("-", w))
-		blue.Println(string(content))
-		white.Println(strings.Repeat("-", w))
-	} else {
-		fmt.Println("-----------")
-		fmt.Printf("   %d.sql    ", i)
-		fmt.Println("-----------")
-		fmt.Println(string(content))
-		fmt.Println("-----------")
+	if !quiet {
+		w, _, err := terminal.GetSize(0)
+		if err == nil {
+			num := fmt.Sprintf("%d.sql", i)
+			white.Println(strings.Repeat("-", w))
+			cyan.Print(strings.Repeat(" ", w/2-len(num)/2))
+			cyan.Print(num)
+			cyan.Println(strings.Repeat(" ", w/2-len(num)/2))
+			white.Println(strings.Repeat("-", w))
+			blue.Println(string(content))
+			white.Println(strings.Repeat("-", w))
+		} else {
+			fmt.Println("-----------")
+			fmt.Printf("   %d.sql    ", i)
+			fmt.Println("-----------")
+			fmt.Println(string(content))
+			fmt.Println("-----------")
+		}
 	}
 
 	if _, err := tx.Exec(string(content)); err != nil {

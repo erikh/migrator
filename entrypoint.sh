@@ -7,7 +7,8 @@ do
   sleep 1
 done
 
-su - postgres -c 'createuser migrator'
-su - postgres -c 'createdb migrator -O migrator'
+export IN_CONTAINER=1 # used by tests to determine if it can drop databases
+
+su - postgres -c 'createuser -s root'
 
 exec "$@"

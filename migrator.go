@@ -40,6 +40,10 @@ func main() {
 			Name:  "port, o",
 			Usage: "Set the port to connect to",
 		},
+		cli.BoolFlag{
+			Name:  "quiet, q",
+			Usage: "Do not output fancy text telling you what ran",
+		},
 	}
 
 	app.Action = migrate
@@ -57,10 +61,15 @@ func migrate(ctx *cli.Context) error {
 		return errors.New("please provide a migration directory")
 	}
 
+	db := ctx.String("database")
+	if db == "" {
+		db = path.Base(args[0])
+	}
+
 	conn, err := pgx.Connect(pgx.ConnConfig{
 		Host:     ctx.String("host"),
 		Port:     uint16(ctx.Int("port")),
-		Database: ctx.String("database"),
+		Database: db,
 		User:     ctx.String("username"),
 		Password: ctx.String("password"),
 	})
@@ -68,5 +77,5 @@ func migrate(ctx *cli.Context) error {
 		return errors.Wrap(err, "migrator")
 	}
 
-	return doMigrate(conn, args[0])
+	return doMigrate(conn, args[0], ctx.Bool("quiet"))
 }

@@ -17,7 +17,8 @@ that is a hell of a lot smarter.
 
 ## Example
 
-For example, your dir should look like this:
+For example, your database must **already be created**, and your dir should
+look like this:
 
 ```
 dir/
@@ -48,6 +49,21 @@ dir/
 
 In this case, if you already migrated up to `2` you will migrate next to `3`
 and `4`. Your schema ID will be `4` after this.
+
+### More Examples
+
+Try:
+
+* Download the repository and make sure docker is installed
+* Run `make shell`. https://github.com/box-builder/box will be installed, an
+  image will be built and a container will be launched for that image with your
+  `$GOPATH` mounted.
+* `createdb one` at the shell. This will create a database in postgres called
+  `one`.
+* `migrator testdata/one` will apply all the migrations for our first test into
+  the `one` database.
+* If you want different db, or user, etc; check out the flags! `migrator
+  --help`.
 
 ## License
 
