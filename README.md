@@ -2,8 +2,6 @@
 
 [![Build Status](https://travis-ci.org/erikh/migrator.svg?branch=master)](https://travis-ci.org/erikh/migrator)<Paste>
 
-**migrator is not quite ready for use yet. Expect this to change in the next few days**
-
 migrator takes a different approach to many schema migration systems that exist
 already: it hands you the gun. migrator applies SQL directly to your database
 in a given order determined by the integers in the filename (minus the `.sql` 
