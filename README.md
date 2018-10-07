@@ -30,8 +30,9 @@ transaction where tables are modified, indexes etc. You can use as advanced SQL
 as you like and as many statements. Nothing is done with set results, so make
 sure they apply to where you want them to!
 
-When finished migrating this directory, your id would be `2`. This will carry
-over to the next run to avoid applying those migrations.
+When finished migrating this directory, your schema version would be `3`. This
+will carry over to the next run by way of a table we create called
+`schema_migrations` to avoid applying those migrations.
 
 To apply new migrations, simply run the run the migrator against the same
 directory with newer migrations:
@@ -46,7 +47,7 @@ dir/
 ```
 
 In this case, if you already migrated up to `2` you will migrate next to `3`
-and `4`. Your schema ID will be `4` after this.
+and `4`. Your schema version will be `5` after this.
 
 ### More Examples
 
