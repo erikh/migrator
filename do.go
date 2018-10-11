@@ -133,13 +133,13 @@ func apply(conn *pgx.Conn, dir string, i int, quiet bool) error {
 			cyan.Print(num)
 			cyan.Println(strings.Repeat(" ", w/2-len(num)/2))
 			white.Println(strings.Repeat("-", w))
-			blue.Println(string(content))
+			blue.Println(strings.TrimSpace(string(content)))
 			white.Println(strings.Repeat("-", w))
 		} else {
 			fmt.Println("-----------")
 			fmt.Printf("   %d.sql    ", i)
 			fmt.Println("-----------")
-			fmt.Println(string(content))
+			fmt.Println(strings.TrimSpace(string(content)))
 			fmt.Println("-----------")
 		}
 	}
