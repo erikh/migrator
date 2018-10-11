@@ -128,13 +128,12 @@ func apply(conn *pgx.Conn, dir string, i int, quiet bool) error {
 		w, _, err := terminal.GetSize(0)
 		if err == nil {
 			num := fmt.Sprintf("%d.sql", i)
-			white.Println(strings.Repeat("-", w))
+			white.Println(strings.Repeat("-", w-1))
 			cyan.Print(strings.Repeat(" ", w/2-len(num)/2))
-			cyan.Print(num)
-			cyan.Println(strings.Repeat(" ", w/2-len(num)/2))
-			white.Println(strings.Repeat("-", w))
+			cyan.Println(num)
+			white.Println(strings.Repeat("-", w-1))
 			blue.Println(strings.TrimSpace(string(content)))
-			white.Println(strings.Repeat("-", w))
+			white.Println(strings.Repeat("-", w-1))
 		} else {
 			fmt.Println("-----------")
 			fmt.Printf("   %d.sql    ", i)
