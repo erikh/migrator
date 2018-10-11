@@ -110,6 +110,7 @@ func (ms *migratorSuite) TestBasic(c *C) {
 	defer conn.Close()
 
 	c.Assert(doMigrate(conn, "testdata/one", true), IsNil)
+	c.Assert(doMigrate(conn, "testdata/one", true), IsNil)
 
 	rows, err := conn.Query("select tablename from pg_catalog.pg_tables where schemaname='public'")
 	c.Assert(err, IsNil)

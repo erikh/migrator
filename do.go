@@ -41,6 +41,11 @@ func doMigrate(conn *pgx.Conn, dir string, quiet bool) (retErr error) {
 		return err
 	}
 
+	// off by one in calc here because we're winding backwards
+	if min-1 == max {
+		return nil
+	}
+
 	for i := min; i <= max; i++ {
 		if err := apply(conn, dir, i, quiet); err != nil {
 			return err
