@@ -50,9 +50,12 @@ func doMigrate(conn *pgx.Conn, dir string, quiet bool) (retErr error) {
 		if err := apply(conn, dir, i, quiet); err != nil {
 			return err
 		}
+		if err := updateMigrationTable(conn, i+1); err != nil {
+			return err
+		}
 	}
 
-	return updateMigrationTable(conn, max+1)
+	return nil
 }
 
 func createSchemaMigrations(conn *pgx.Conn) error {
