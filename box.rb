@@ -6,7 +6,7 @@ run "apt-get install postgresql-all -y"
 run "mkdir /postgresql"
 run "chown postgres:postgres /postgresql"
 
-run "su - postgres -c '/usr/lib/postgresql/9.6/bin/initdb -D /postgresql'"
+run "su - postgres -c '/usr/lib/postgresql/*/bin/initdb -D /postgresql'"
 
 copy "entrypoint.sh", "/"
 run "chmod 755 /entrypoint.sh"

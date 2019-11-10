@@ -34,6 +34,7 @@ func mkDB(db string) error {
 	if err != nil {
 		return err
 	}
+	defer conn.Close()
 
 	_, err = conn.Exec(fmt.Sprintf("create database %s", db))
 	return err
@@ -100,6 +101,23 @@ func (ms *migratorSuite) SetUpTest(c *C) {
 
 func (ms *migratorSuite) TearDownTest(c *C) {
 	c.Assert(clearDBs(), IsNil)
+}
+
+func (ms *migratorSuite) TestRecovery(c *C) {
+	c.Assert(mkDB("bad"), IsNil)
+
+	conn, err := getDB("bad")
+	c.Assert(err, IsNil)
+	defer conn.Close()
+
+	c.Assert(doMigrate(conn, "testdata/bad", true), NotNil)
+	c.Assert(doMigrate(conn, "testdata/bad", true), NotNil)
+
+	row := conn.QueryRow("select max(id) from schema_migrations")
+	var id int
+	c.Assert(row.Scan(&id), IsNil)
+	// the bad dir has 3 good migrations and one bad one at the end. the max value should be 2..
+	c.Assert(id, Equals, 3)
 }
 
 func (ms *migratorSuite) TestBasic(c *C) {
