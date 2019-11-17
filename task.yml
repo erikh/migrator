@@ -1,5 +1,5 @@
 mountpoint: "/go/src/github.com/erikh/migrator"
 runs:
   main:
-    image: "golang:1.12.4"
+    image: "golang:latest"
     command: [ "bash", "run_test.sh" ]
