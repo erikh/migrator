@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"os"
 	"path"
@@ -41,6 +42,14 @@ func main() {
 			Usage: "Set the port to connect to",
 		},
 		cli.BoolFlag{
+			Name:  "ssl, s",
+			Usage: "Require SSL",
+		},
+		cli.BoolFlag{
+			Name:  "skip-verify",
+			Usage: "Skip SSL verification",
+		},
+		cli.BoolFlag{
 			Name:  "quiet, q",
 			Usage: "Do not output fancy text telling you what ran",
 		},
@@ -66,12 +75,21 @@ func migrate(ctx *cli.Context) error {
 		db = path.Base(args[0])
 	}
 
+	var tlsConfig *tls.Config
+	if ctx.Bool("ssl") {
+		tlsConfig = &tls.Config{
+			ServerName:         ctx.String("host"),
+			InsecureSkipVerify: ctx.Bool("skip-verify"),
+		}
+	}
+
 	conn, err := pgx.Connect(pgx.ConnConfig{
-		Host:     ctx.String("host"),
-		Port:     uint16(ctx.Int("port")),
-		Database: db,
-		User:     ctx.String("username"),
-		Password: ctx.String("password"),
+		Host:      ctx.String("host"),
+		Port:      uint16(ctx.Int("port")),
+		Database:  db,
+		User:      ctx.String("username"),
+		Password:  ctx.String("password"),
+		TLSConfig: tlsConfig,
 	})
 	if err != nil {
 		return errors.Wrap(err, "migrator")
